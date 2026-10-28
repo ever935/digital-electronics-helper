@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>数电小帮手 · 数字电子技术 AI 答疑</title>
+<style>
+:root{--blue:#185FA5;--blue-d:#0F447C;--blue-bg:#E6F1FB;--blue-l:#F2F8FD;
+--ink:#1f2328;--ink2:#4a5158;--ink3:#6e7781;--line:#dfe3e8;--bg:#f7f9fb;
+--teal:#0F6E56;--teal-bg:#E1F5EE;--amber:#854F0B;--amber-bg:#FAEEDA;--red:#A32D2D;--red-bg:#FCEBEB}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font:15px/1.7 -apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+header{background:var(--blue);color:#fff;padding:14px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+header h1{font-size:19px;margin:0;font-weight:600}
+header .sub{font-size:12.5px;opacity:.85}
+header .sp{flex:1}
+.btn{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);color:#fff;
+padding:6px 12px;border-radius:6px;font-size:13px;cursor:pointer}
+.btn:hover{background:rgba(255,255,255,.28)}
+.wrap{display:grid;grid-template-columns:220px 1fr 310px;gap:14px;padding:14px;max-width:1500px;margin:0 auto}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px}
+.card h3{font-size:14px;margin:0 0 10px;color:var(--blue-d);font-weight:600}
+/* 左栏 */
+.ch-item{padding:8px 10px;border-radius:6px;cursor:pointer;font-size:14px;margin-bottom:3px}
+.ch-item:hover{background:var(--blue-l)}
+.ch-item.on{background:var(--blue);color:#fff}
+.q-list{margin-top:12px;max-height:52vh;overflow:auto}
+.q-item{padding:7px 9px;border-radius:6px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--line2,#eef1f4)}
+.q-item:hover{background:var(--blue-l)}
+.q-item .id{color:var(--blue);font-weight:600}
+.q-item .st{color:var(--ink2);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* 中栏 */
+.chat{height:52vh;overflow:auto;padding:4px 2px}
+.msg{margin-bottom:14px}
+.msg.me{text-align:right}
+.bubble{display:inline-block;max-width:88%;padding:9px 13px;border-radius:10px;font-size:14px;text-align:left}
+.msg.me .bubble{background:var(--blue);color:#fff}
+.msg.ai .bubble{background:var(--blue-l);border:1px solid #cfe3f7;color:var(--ink)}
+.bubble h4{margin:10px 0 4px;font-size:13.5px;color:var(--blue-d)}
+.bubble h4:first-child{margin-top:0}
+.bubble p{margin:0 0 6px}
+.bubble .ref{margin-top:8px;padding-top:7px;border-top:1px dashed #b9d4ee;font-size:12.5px;color:var(--ink3)}
+.bubble .blank{background:var(--amber-bg);border-left:3px solid var(--amber);padding:6px 10px;border-radius:0 6px 6px 0}
+.tag{display:inline-block;background:var(--blue-bg);color:var(--blue-d);border-radius:4px;
+padding:1px 7px;font-size:12px;margin:2px 4px 2px 0}
+.input-row{display:flex;gap:8px;margin-top:12px}
+input[type=text],textarea,select{font:inherit;font-size:14px;padding:8px 10px;border:1px solid var(--line);
+border-radius:6px;width:100%;background:#fff}
+textarea{resize:vertical;min-height:62px}
+.send{background:var(--blue);color:#fff;border:0;border-radius:6px;padding:8px 18px;cursor:pointer;font-size:14px}
+.send:hover{background:var(--blue-d)}
+.hint{font-size:12.5px;color:var(--ink3);margin-top:8px}
+/* 右栏 */
+.kv{display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px solid var(--line2,#eef1f4)}
+.kv .k{color:var(--ink3)}
+.badge{display:inline-block;background:var(--teal-bg);color:var(--teal);border-radius:4px;
+padding:1px 8px;font-size:12px;font-weight:600}
+.badge.warn{background:var(--amber-bg);color:var(--amber)}
+.badge.red{background:var(--red-bg);color:var(--red)}
+.wrong-item{font-size:13px;padding:7px 0;border-bottom:1px solid var(--line2,#eef1f4)}
+.wrong-item .t{font-weight:600}
+.wrong-item .m{color:var(--ink3);font-size:12px}
+.mini{font-size:12.5px;color:var(--ink3)}
+.stat{display:flex;gap:8px;margin-bottom:10px}
+.stat div{flex:1;background:var(--blue-l);border-radius:8px;padding:8px;text-align:center}
+.stat b{display:block;font-size:18px;color:var(--blue-d)}
+.stat span{font-size:11.5px;color:var(--ink3)}
+fieldset{border:1px solid var(--line);border-radius:8px;padding:10px;margin:10px 0 0}
+legend{font-size:12.5px;color:var(--ink2);padding:0 5px}
+.row{display:flex;gap:6px;margin-bottom:6px}
+.row>*{flex:1}
+/* 弹窗 */
+.mask{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:9}
+.mask.on{display:flex}
+.modal{background:#fff;border-radius:12px;padding:20px;width:min(480px,92vw);max-height:88vh;overflow:auto}
+.modal h3{margin:0 0 12px;font-size:16px}
+label{font-size:12.5px;color:var(--ink2);display:block;margin:8px 0 3px}
+@media(max-width:960px){
+  .wrap{grid-template-columns:1fr}
+  .chat{height:auto;max-height:46vh}
+  .q-list{max-height:30vh}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>数电小帮手</h1>
+  <span class="sub">《数字电子技术》课程 AI 答疑 · 可溯源 · 不剧透</span>
+  <span class="sp"></span>
+  <button class="btn" onclick="openCfg()">模型设置</button>
+  <button class="btn" onclick="openAdd()">录入错题</button>
+</header>
+
+<div class="wrap">
+  <!-- 左栏：章节导航 -->
+  <div class="card">
+    <h3>章节导航</h3>
+    <div id="chapters"></div>
+    <div class="q-list" id="qlist"></div>
+  </div>
+
+  <!-- 中栏：问答区 -->
+  <div class="card">
+    <h3>问答区</h3>
+    <div class="chat" id="chat"></div>
+    <div class="input-row">
+      <textarea id="q" placeholder="把题目粘贴进来，或描述你卡在哪一步……（例：卡诺图怎么圈四角？）"></textarea>
+    </div>
+    <div class="input-row">
+      <button class="send" onclick="ask()">提问</button>
+      <button class="btn" style="background:#fff;color:var(--blue);border:1px solid var(--line)" onclick="clearChat()">清空</button>
+    </div>
+    <div class="hint" id="mode"></div>
+  </div>
+
+  <!-- 右栏：知识点卡片 + 错题本 -->
+  <div class="card">
+    <h3>本题知识点</h3>
+    <div id="kcard"><p class="mini">提问后这里显示匹配到的知识点、出处与同类题。</p></div>
+
+    <h3 style="margin-top:18px">错题本</h3>
+    <div class="stat">
+      <div><b id="s-due">0</b><span>今日待复习</span></div>
+      <div><b id="s-all">0</b><span>在册错题</span></div>
+      <div><b id="s-ok">0</b><span>已掌握</span></div>
+    </div>
+    <div id="wdist" class="mini" style="margin-bottom:8px"></div>
+    <div id="wlist"></div>
+    <div class="input-row">
+      <button class="send" style="flex:1" onclick="review()">开始复习</button>
+    </div>
+  </div>
+</div>
+
+<!-- 模型设置 -->
+<div class="mask" id="m-cfg">
+  <div class="modal">
+    <h3>大模型设置（可选）</h3>
+    <p class="mini">不填写也能正常使用：系统用本地题库与索引做检索式答疑，真实可溯源。
+    填写后切换到真实大模型，密钥只存在本机浏览器，不上传任何服务器。</p>
+    <label>API Base URL（需兼容 OpenAI Chat Completions）</label>
+    <input type="text" id="cfg-base" placeholder="https://api.deepseek.com/v1/chat/completions">
+    <label>API Key</label>
+    <input type="text" id="cfg-key" placeholder="sk-...">
+    <label>模型名</label>
+    <input type="text" id="cfg-model" placeholder="deepseek-chat">
+    <div class="input-row" style="margin-top:14px">
+      <button class="send" style="flex:1" onclick="saveCfg()">保存</button>
+      <button class="btn" style="background:#fff;color:var(--ink2);border:1px solid var(--line)" onclick="closeM()">取消</button>
+    </div>
+  </div>
+</div>
+
+<!-- 录入错题 -->
+<div class="mask" id="m-add">
+  <div class="modal">
+    <h3>录入错题</h3>
+    <label>题号（从题库点选，或手填如 Q042）</label>
+    <input type="text" id="w-id" placeholder="Q042">
+    <label>题干摘要</label>
+    <input type="text" id="w-stem" placeholder="例：四变量卡诺图化简">
+    <div class="row">
+      <div><label>章节</label><select id="w-ch"></select></div>
+      <div><label>错误类型</label>
+        <select id="w-type">
+          <option value="A">A 概念性</option>
+          <option value="B">B 计算/化简</option>
+          <option value="C">C 时序分析</option>
+          <option value="D">D 芯片引脚与接线</option>
+          <option value="E">E 审题/粗心</option>
+        </select>
+      </div>
+    </div>
+    <label>知识点标签</label>
+    <input type="text" id="w-tags" placeholder="卡诺图化简;组合电路设计">
+    <label>我的答案（可不填）</label>
+    <input type="text" id="w-ans">
+    <div class="input-row" style="margin-top:14px">
+      <button class="send" style="flex:1" onclick="addWrong()">保存</button>
+      <button class="btn" style="background:#fff;color:var(--ink2);border:1px solid var(--line)" onclick="closeM()">取消</button>
+    </div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script>
+const D = window.SD_DATA;
+const search = window.SD_SEARCH;   // 检索实现在 data.js 中,与冒烟测试共用同一份
+const GAPS = [1,2,4,7,15];
+let curCh = '', curQ = null;
+
+/* ---------- 初始化 ---------- */
+(function init(){
+  const c = document.getElementById('chapters');
+  Object.keys(D.chapters).forEach(k=>{
+    const d = document.createElement('div');
+    d.className='ch-item'; d.dataset.ch=k;
+    d.textContent = k + ' ' + D.chapters[k];
+    d.onclick = ()=>{ curCh = (curCh===k?'':k); paintCh(); paintQ(); };
+    c.appendChild(d);
+  });
+  const s = document.getElementById('w-ch');
+  Object.keys(D.chapters).forEach(k=>{
+    const o=document.createElement('option'); o.value=k; o.textContent=k+' '+D.chapters[k]; s.appendChild(o);
+  });
+  paintCh(); paintQ(); paintWrong(); paintMode();
+  say('ai','你好，我是数电小帮手。把题目粘贴进来，或者从左边章节里挑一道。<br><br>我会先告诉你这题考哪个知识点、怎么下手、容易错在哪，<b>但第一轮不给最终答案</b>——你先做，做完把结果发我，我帮你核对。');
+})();
+function paintCh(){
+  document.querySelectorAll('.ch-item').forEach(e=>e.classList.toggle('on', e.dataset.ch===curCh));
+}
+function paintQ(){
+  const box = document.getElementById('qlist');
+  const list = D.questions.filter(q=>!curCh || q.ch===curCh);
+  box.innerHTML = list.slice(0,60).map(q=>
+    '<div class="q-item" data-id="'+q.id+'"><span class="id">'+q.id+'</span>'+
+    '<span class="st">'+esc(q.stem.slice(0,26))+'</span></div>').join('');
+  box.querySelectorAll('.q-item').forEach(e=>e.onclick=()=>{
+    const q = D.questions.find(x=>x.id===e.dataset.id);
+    curQ = q; paintKCard(q);
+    document.getElementById('q').value = q.stem + '\n（' + q.id + '，这题我该怎么入手？）';
+  });
+}
+function paintMode(){
+  const cfg = getCfg();
+  document.getElementById('mode').textContent = cfg && cfg.key
+    ? '当前：真实大模型（'+cfg.model+'）'
+    : '当前：本地检索模式（无需密钥，回答来自题库与索引，真实可溯源）';
+}
+
+/* ---------- 四段式回答 ---------- */
+function buildAnswer(top, text){
+  if(!top.length){
+    return '<h4>1. 知识点定位</h4><p>这个点在当前课程资料里没有检索到对应题目。</p>'+
+      '<h4>2. 建议</h4><p>这个点超出本课程资料范围，建议查阅教材相应章节或请教任课老师。'+
+      '我不会凭印象给你编一个答案。</p>'+
+      '<div class="ref">参考：本课程知识库无对应文件（超出范围）</div>';
+  }
+  const p = top[0], tags = p.tags, chName = D.chapters[p.ch] || p.ch;
+  let h = '<h4>1. 知识点定位</h4><p>第 '+p.ch+' 章「'+chName+'」，考点是 <b>'+tags.join('、')+'</b>。</p>';
+  h += '<p>'+tags.map(t=>'<span class="tag">'+t+'</span>').join('')+'</p>';
+  h += '<h4>2. 解题思路</h4><p>'+(D.typeHints[p.type]||'先判断题型，再按步骤推进。')+'</p>';
+  h += '<div class="blank"><b>'+p.stem+'</b><br>先按上面的步骤自己走一遍，'+
+       '把你的中间结果发我，我帮你看哪一步出了问题。<b>这一轮先不给你最终答案。</b></div>';
+  h += '<h4>3. 易错提醒</h4><p>'+(D.tagTips[tags[0]]||'注意本题所属知识点的典型错误。')+'</p>';
+  if(tags[1]) h += '<p>'+(D.tagTips[tags[1]]||'')+'</p>';
+  const same = D.questions.filter(x=>x.id!==p.id && x.tags.some(t=>tags.indexOf(t)>=0)
+                 && Math.abs(x.diff-p.diff)<=1).slice(0,2);
+  h += '<h4>4. 同类题推荐</h4>' + (same.length
+      ? '<p>'+same.map(x=>'建议先试 <b>'+x.id+'</b>（'+srcText(x)+'）').join('；')+'，做完把答案发我。</p>'
+      : '<p>题库中暂无同标签、邻近难度的题目，可先复习本章其他题目。</p>');
+  h += '<div class="ref">参考：《'+p.src+'》第 '+p.page+' 页</div>';
+  return h;
+}
+function srcText(x){ return x.page==='—' ? '自整理题，第 '+x.ch+' 章' : '《'+x.src+'》第 '+x.page+' 页'; }
+
+/* ---------- 对话 ---------- */
+function say(who, html){
+  const box = document.getElementById('chat');
+  const d = document.createElement('div');
+  d.className = 'msg ' + (who==='me'?'me':'ai');
+  d.innerHTML = '<div class="bubble">'+html+'</div>';
+  box.appendChild(d); box.scrollTop = box.scrollHeight;
+}
+function esc(s){ return String(s).replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+function clearChat(){ document.getElementById('chat').innerHTML=''; curQ=null;
+  document.getElementById('kcard').innerHTML='<p class="mini">提问后这里显示匹配到的知识点、出处与同类题。</p>'; }
+
+async function ask(){
+  const el = document.getElementById('q');
+  const text = el.value.trim();
+  if(!text) return;
+  say('me', esc(text).replace(/\n/g,'<br>'));
+  el.value = '';
+  const top = search(text);
+  if(top.length) paintKCard(top[0]);
+  const cfg = getCfg();
+  if(cfg && cfg.key){
+    say('ai','<i>正在调用大模型……</i>');
+    try{
+      const r = await callLLM(text, top);
+      const msgs = document.querySelectorAll('#chat .msg.ai');
+      msgs[msgs.length-1].querySelector('.bubble').innerHTML = esc(r).replace(/\n/g,'<br>');
+      return;
+    }catch(e){
+      const msgs = document.querySelectorAll('#chat .msg.ai');
+      msgs[msgs.length-1].querySelector('.bubble').innerHTML =
+        '<p>大模型调用失败（'+esc(e.message)+'），已回退本地检索模式。</p>' + buildAnswer(top, text);
+      return;
+    }
+  }
+  say('ai', buildAnswer(top, text));
+}
+
+/* ---------- 大模型（可选） ---------- */
+const SYS = '你是《数字电子技术》课程辅导教师「数电小帮手」。回答强制四段式：'+
+'1 知识点定位 2 解题思路（关键计算留白）3 易错提醒 4 同类题推荐（只给题号）。'+
+'禁止第一轮给出最终答案，先问学生卡在哪一步。每条回答末尾用「参考：《文件名》第 X 页」标明出处。'+
+'库中没有的内容直接说明超出范围，严禁编造公式、引脚定义或芯片参数。';
+function getCfg(){
+  try{ return JSON.parse(localStorage.getItem('sd_cfg')||'null'); }catch(e){ return null; }
+}
+async function callLLM(text, top){
+  const cfg = getCfg();
+  const ctx = top.length ? ('\n\n【检索到的最相关题目】\n'+top.slice(0,3).map(p=>
+    p.id+' | 第'+p.ch+'章 | '+p.type+' | 难度'+p.diff+' | '+p.stem+' | 标签:'+p.tags.join(';')+
+    ' | 出处:《'+p.src+'》第'+p.page+'页').join('\n')) : '\n\n【检索结果】无匹配，本题可能超出课程资料范围。';
+  const body = {model: cfg.model, messages:[
+    {role:'system', content: SYS},
+    {role:'user', content: text + ctx}
+  ], temperature:0.3};
+  const res = await fetch(cfg.base, {method:'POST', headers:{
+    'Content-Type':'application/json','Authorization':'Bearer '+cfg.key}, body:JSON.stringify(body)});
+  if(!res.ok) throw new Error('HTTP '+res.status);
+  const j = await res.json();
+  return (j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || JSON.stringify(j);
+}
+function openCfg(){
+  const c = getCfg() || {};
+  document.getElementById('cfg-base').value = c.base||'';
+  document.getElementById('cfg-key').value = c.key||'';
+  document.getElementById('cfg-model').value = c.model||'';
+  document.getElementById('m-cfg').classList.add('on');
+}
+function saveCfg(){
+  localStorage.setItem('sd_cfg', JSON.stringify({
+    base: document.getElementById('cfg-base').value.trim(),
+    key: document.getElementById('cfg-key').value.trim(),
+    model: document.getElementById('cfg-model').value.trim()}));
+  closeM(); paintMode();
+}
+
+/* ---------- 知识点卡片 ---------- */
+function paintKCard(q){
+  document.getElementById('kcard').innerHTML =
+    '<div class="kv"><span class="k">题号</span><span>'+q.id+'</span></div>'+
+    '<div class="kv"><span class="k">章节</span><span>'+q.ch+' '+D.chapters[q.ch]+'</span></div>'+
+    '<div class="kv"><span class="k">题型 / 难度</span><span>'+q.type+' / '+q.diff+'</span></div>'+
+    '<div class="kv"><span class="k">出处</span><span style="text-align:right">'+srcText(q)+'</span></div>'+
+    '<div style="margin-top:8px">'+q.tags.map(t=>'<span class="tag">'+t+'</span>').join('')+'</div>'+
+    '<div class="mini" style="margin-top:8px">'+(D.tagTips[q.tags[0]]||'')+'</div>';
+}
+
+/* ---------- 错题本 ---------- */
+function loadW(){ try{ return JSON.parse(localStorage.getItem('sd_wrong')||'[]'); }catch(e){ return []; } }
+function saveW(a){ localStorage.setItem('sd_wrong', JSON.stringify(a)); }
+function today(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function addDays(n){ const d=new Date(); d.setDate(d.getDate()+n);
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function openAdd(){ document.getElementById('m-add').classList.add('on'); }
+function closeM(){ document.querySelectorAll('.mask').forEach(m=>m.classList.remove('on')); }
+function addWrong(){
+  const id = document.getElementById('w-id').value.trim();
+  const stem = document.getElementById('w-stem').value.trim();
+  if(!stem && !id){ alert('至少填写题号或题干摘要'); return; }
+  const a = loadW();
+  a.push({id: id||('W'+Date.now().toString().slice(-6)), stem: stem||'（未填写摘要）',
+    ch: document.getElementById('w-ch').value,
+    type: document.getElementById('w-type').value,
+    tags: document.getElementById('w-tags').value.trim(),
+    my: document.getElementById('w-ans').value.trim(),
+    master: 3, reps: 0, next: addDays(1), date: today(), done: false});
+  saveW(a); closeM(); paintWrong();
+  ['w-id','w-stem','w-tags','w-ans'].forEach(i=>document.getElementById(i).value='');
+}
+function paintWrong(){
+  const a = loadW(), t = today();
+  const live = a.filter(x=>!x.done);
+  document.getElementById('s-due').textContent = live.filter(x=>x.next<=t).length;
+  document.getElementById('s-all').textContent = live.length;
+  document.getElementById('s-ok').textContent = a.filter(x=>x.done).length;
+  const dist = {};
+  live.forEach(x=>dist[x.ch]=(dist[x.ch]||0)+1);
+  document.getElementById('wdist').innerHTML = Object.keys(dist).length
+    ? '章节分布：' + Object.keys(dist).sort().map(k=>D.chapters[k]+' '+dist[k]).join(' · ')
+    : '暂无错题记录';
+  const box = document.getElementById('wlist');
+  const recent = live.slice(-5).reverse();
+  box.innerHTML = recent.length ? '<div class="mini" style="margin-bottom:6px">最近录入</div>' +
+    recent.map((x,i)=>'<div class="wrong-item"><span class="t">'+esc(x.id)+'</span> '+
+      '<span class="badge'+(x.next<=t?' red':'')+'">'+(x.next<=t?'今日到期':'下次 '+x.next)+'</span>'+
+      '<div class="m">'+esc(x.stem.slice(0,24))+' · '+x.type+'类 · 掌握度 '+x.master+'</div>'+
+      '<div class="m"><a href="javascript:;" onclick="markOk(\''+x.id+'\')">标记已掌握</a> · '+
+      '<a href="javascript:;" onclick="bump(\''+x.id+'\',1)">答对</a> · '+
+      '<a href="javascript:;" onclick="bump(\''+x.id+'\',0)">答错</a></div></div>').join('')
+    : '<p class="mini">还没有错题。做完题后把做错的录进来，系统会按 1→2→4→7→15 天安排复习。</p>';
+}
+function findW(id){ const a=loadW(); return a.find(x=>x.id===id); }
+function bump(id, ok){
+  const a = loadW(), x = a.find(v=>v.id===id); if(!x) return;
+  x.reps++;
+  if(ok){ x.master = Math.min(5, x.master+1); x.next = addDays(GAPS[Math.min(4, x.master-1)]);
+    if(x.master>=5 && x.reps>=2){ x.done = true; } }
+  else { x.master = Math.max(0, x.master-1); x.next = addDays(1); }
+  saveW(a); paintWrong();
+}
+function markOk(id){ const a=loadW(), x=a.find(v=>v.id===id); if(x){ x.done=true; saveW(a); paintWrong(); } }
+function review(){
+  const a = loadW(), t = today();
+  const due = a.filter(x=>!x.done && x.next<=t);
+  if(!due.length){
+    const any = a.filter(x=>!x.done);
+    if(!any.length){ say('ai','错题本是空的。先做几道题，把做错的录进来。'); return; }
+    const x = any[0];
+    say('ai','<h4>复习（未到期，先练一题）</h4><p><b>'+esc(x.id)+'</b> '+esc(x.stem)+'</p>'+
+      '<div class="blank">先自己做，做完对照答案；答对点「答对」，答错点「答错」。</div>');
+    return;
+  }
+  const x = due[0];
+  const same = D.questions.filter(p=>x.tags && p.tags.some(t=>x.tags.indexOf(t)>=0)).slice(0,2);
+  say('ai','<h4>今日复习 · 到期 '+due.length+' 题</h4><p><b>'+esc(x.id)+'</b> '+esc(x.stem)+
+    '</p><p>错误类型：'+x.type+' 类 · 掌握度 '+x.master+'/5</p>'+
+    '<div class="blank">先自己做一遍，<b>不要翻答案</b>。做完点右侧错题本里的「答对 / 答错」。</div>'+
+    (same.length ? '<p>同类题：'+same.map(p=>'<b>'+p.id+'</b>').join('、')+'（只给题号，不给答案）</p>' : '')+
+    '<div class="ref">复习档位：1 → 2 → 4 → 7 → 15 天，答对升档，答错降回 1 天</div>');
+}
+document.getElementById('q').addEventListener('keydown', e=>{
+  if(e.key==='Enter' && (e.ctrlKey||e.metaKey)) ask();
+});
+</script>
+</body>
+</html>
